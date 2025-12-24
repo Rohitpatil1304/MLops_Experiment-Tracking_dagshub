@@ -1,4 +1,4 @@
-emotion-detection
+Emotion-detection
 ==============================
 
 A small practice over Machine Larning Pipelining
