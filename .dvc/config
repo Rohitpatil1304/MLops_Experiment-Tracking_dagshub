@@ -1,2 +1,6 @@
 [cache]
     dir = C:\temp\dvc_cache
+[core]
+    remote = my-remote
+['remote "my-remote"']
+    url = C:\Users\Rohit\AppData\Local\Temp
