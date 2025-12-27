@@ -76,40 +76,40 @@ stages:
   model_building:
     cmd: python src/models/model_building.py
     deps:
-    - path: data/features/test_bow.csv
-      hash: md5
-      md5: dca7b268ac960915a16f35d54793d607
-      size: 427597
     - path: data/features/train_bow.csv
       hash: md5
       md5: 60e4f97c6349913b167a08a423a7a94a
       size: 641219
     - path: src/models/model_building.py
       hash: md5
-      md5: 9ddd2a463eee8a338ba9fdb3dcbd9026
-      size: 4592
+      md5: 64bf62c91e0b0183e26bb63b73eab394
+      size: 5367
     params:
       params.yaml:
         model_building.learning_rate: 0.1
         model_building.n_estimators: 100
     outs:
-    - path: model.pkl
+    - path: models/model.pkl
       hash: md5
       md5: 55fe32c45569d6f9587d86eebbcd29c5
       size: 137290
   model_evaluation:
     cmd: python src/models/model_evaluation.py
     deps:
-    - path: model.pkl
+    - path: data/features/test_bow.csv
+      hash: md5
+      md5: dca7b268ac960915a16f35d54793d607
+      size: 427597
+    - path: models/model.pkl
       hash: md5
       md5: 55fe32c45569d6f9587d86eebbcd29c5
       size: 137290
     - path: src/models/model_evaluation.py
       hash: md5
-      md5: 0fc692d4ce0c4f73d0a43bfc2cde6b52
-      size: 4360
+      md5: 16dcbfa64b94440b773962e37259dca0
+      size: 5126
     outs:
-    - path: metrics.json
+    - path: reports/metrics.json
       hash: md5
       md5: 63a4696516cd9c6d8c21dd599e1f93fb
       size: 142

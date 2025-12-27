@@ -127,10 +127,32 @@ def save_model(model: BaseEstimator, path: str) -> None:
         raise e
 
 
+# def main() -> None:
+#     PARAMS_PATH = "params.yaml"
+#     FEATURES_PATH = os.path.join("data", "features", "train_bow.csv")
+#     MODEL_PATH = "model.pkl"
+
+#     try:
+#         logger.info("🚀 Starting Model Building Pipeline")
+
+#         n_estimators, learning_rate = load_params(PARAMS_PATH)
+#         train_df = load_features(FEATURES_PATH)
+
+#         X_train, y_train = split_features_and_labels(train_df)
+#         model = train_model(X_train, y_train, n_estimators, learning_rate)
+
+#         save_model(model, MODEL_PATH)
+
+#         logger.info("Model building completed and model saved successfully.")
+
+#     except Exception as e:
+#         logger.error(f"Model building pipeline failed: {e}")
+#         raise e
+
 def main() -> None:
     PARAMS_PATH = "params.yaml"
     FEATURES_PATH = os.path.join("data", "features", "train_bow.csv")
-    MODEL_PATH = "model.pkl"
+    MODEL_PATH = os.path.join("models", "model.pkl")
 
     try:
         logger.info("🚀 Starting Model Building Pipeline")
@@ -148,6 +170,7 @@ def main() -> None:
     except Exception as e:
         logger.error(f"Model building pipeline failed: {e}")
         raise e
+
 
 
 if __name__ == "__main__":
