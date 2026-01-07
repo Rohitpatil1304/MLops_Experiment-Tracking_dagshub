@@ -9,6 +9,11 @@ import mlflow.sklearn
 
 mlflow.set_experiment("DT_Model")
 
+import dagshub
+dagshub.init(repo_owner='Rohitpatil1304', repo_name='MLops_Experiment-Tracking_dagshub', mlflow=True)
+
+mlflow.set_tracking_uri("https://dagshub.com/Rohitpatil1304/MLops_Experiment-Tracking_dagshub.mlflow")
+
 df = pd.read_csv("college_student_placement_dataset.csv")
 df.drop(columns=["College_ID"], inplace=True)
 
