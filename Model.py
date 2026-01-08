@@ -92,4 +92,34 @@ with mlflow.start_run(run_name="Student_Placement_DT"):
     # Log model
     mlflow.sklearn.log_model(model, "decision_tree_model")
 
+    mlflow.set_tag("model_type", "Decision Tree Classifier")
+    mlflow.set_tag("Author", "Rohit Patil")
+
+#---------------------------------------------------------
+    train_log = X_train
+    train_log["Placement"] = y_train
+
+    test_log = X_test
+    test_log["Placement"] = y_test
+
+    train_log = mlflow.data.from_pandas(train_log)
+    test_log = mlflow.data.from_pandas(test_log)
+#---------------------------------------------------------
+    train_log_Featured = pd.DataFrame(X_train_enc)
+    train_log_Featured["Placement"] = y_train_trans
+
+    test_log_Featured = pd.DataFrame(X_test_enc)
+    test_log_Featured["Placement"] = y_test_trans
+                                                               
+    train_log_Featured = mlflow.data.from_pandas(train_log_Featured)              
+    test_log_Featured = mlflow.data.from_pandas(test_log_Featured)       
+
+#---------------------------------------------------------
+
+    mlflow.log_input(train_log, "train_data")
+    mlflow.log_input(test_log, "test_data")
+
+    mlflow.log_input(train_log_Featured, "train_data_encoded")
+    mlflow.log_input(test_log_Featured, "test_data_encoded")
+    
     print(f"Model Accuracy: {accuracy * 100:.2f}%")
