@@ -123,28 +123,6 @@ def save_metrics(metrics: Dict[str, float], path: str) -> None:
         raise e
 
 
-# def main() -> None:
-#     TEST_FEATURES_PATH = os.path.join("data", "features", "test_bow.csv")
-#     MODEL_PATH = "model.pkl"
-#     METRICS_PATH = "reports/metrics.json"
-
-#     try:
-#         logger.info("🚀 Starting Model Evaluation Pipeline")
-
-#         test_df = load_features(TEST_FEATURES_PATH)
-#         model = load_model(MODEL_PATH)
-
-#         X_test, y_test = split_features_and_labels(test_df)
-#         metrics = evaluate_model(model, X_test, y_test)
-
-#         save_metrics(metrics, METRICS_PATH)
-
-#         logger.info("Model evaluation completed successfully.")
-
-#     except Exception as e:
-#         logger.error(f"Model evaluation pipeline failed: {e}")
-#         raise e
-
 def main() -> None:
     TEST_FEATURES_PATH = os.path.join("data", "features", "test_bow.csv")
     MODEL_PATH = os.path.join("models", "model.pkl")
