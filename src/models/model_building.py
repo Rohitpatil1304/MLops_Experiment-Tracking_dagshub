@@ -7,6 +7,12 @@ import yaml
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.base import BaseEstimator
 import logging
+import mlflow
+import mlflow.sklearn
+
+# Set experiment name
+mlflow.set_experiment("GradientBoosting_Model_Building")
+
 
 # ---------------- Logging Configuration ---------------- #
 logger = logging.getLogger("model_building")
@@ -126,50 +132,53 @@ def save_model(model: BaseEstimator, path: str) -> None:
         logger.exception("Error saving model")
         raise e
 
-
-# def main() -> None:
-#     PARAMS_PATH = "params.yaml"
-#     FEATURES_PATH = os.path.join("data", "features", "train_bow.csv")
-#     MODEL_PATH = "model.pkl"
-
-#     try:
-#         logger.info("🚀 Starting Model Building Pipeline")
-
-#         n_estimators, learning_rate = load_params(PARAMS_PATH)
-#         train_df = load_features(FEATURES_PATH)
-
-#         X_train, y_train = split_features_and_labels(train_df)
-#         model = train_model(X_train, y_train, n_estimators, learning_rate)
-
-#         save_model(model, MODEL_PATH)
-
-#         logger.info("Model building completed and model saved successfully.")
-
-#     except Exception as e:
-#         logger.error(f"Model building pipeline failed: {e}")
-#         raise e
-
 def main() -> None:
     PARAMS_PATH = "params.yaml"
     FEATURES_PATH = os.path.join("data", "features", "train_bow.csv")
     MODEL_PATH = os.path.join("models", "model.pkl")
 
-    try:
-        logger.info("🚀 Starting Model Building Pipeline")
+    # Start MLflow run
+    with mlflow.start_run() as run:
+        try:
+            logger.info("🚀 Starting Model Building Pipeline")
+            logger.info(f"MLflow Run ID: {run.info.run_id}")
 
-        n_estimators, learning_rate = load_params(PARAMS_PATH)
-        train_df = load_features(FEATURES_PATH)
+            n_estimators, learning_rate = load_params(PARAMS_PATH)
+            train_df = load_features(FEATURES_PATH)
 
-        X_train, y_train = split_features_and_labels(train_df)
-        model = train_model(X_train, y_train, n_estimators, learning_rate)
+            X_train, y_train = split_features_and_labels(train_df)
+            
+            # Log parameters
+            mlflow.log_param("n_estimators", n_estimators)
+            mlflow.log_param("learning_rate", learning_rate)
+            mlflow.log_param("random_state", 42)
+            mlflow.log_param("train_samples", len(X_train))
+            mlflow.log_param("train_features", X_train.shape[1])
+            logger.info("Logged model parameters to MLflow")
+            
+            model = train_model(X_train, y_train, n_estimators, learning_rate)
 
-        save_model(model, MODEL_PATH)
+            save_model(model, MODEL_PATH)
+            logger.info(f"Model saved to {MODEL_PATH}")
+            
+            # Log model and artifacts
+            mlflow.sklearn.log_model(model, "model", registered_model_name="GradientBoosting_Model")
+            mlflow.log_artifact(MODEL_PATH, "artifacts")
+            mlflow.log_artifact(PARAMS_PATH, "config")
+            logger.info("Logged model and artifacts to MLflow")
+            
+            # Log dataset info
+            mlflow.log_param("dataset_samples", len(train_df))
+            mlflow.log_param("dataset_features", train_df.shape[1])
+            logger.info("Logged dataset information to MLflow")
 
-        logger.info("Model building completed and model saved successfully.")
+            logger.info("Model building completed and tracked successfully.")
 
-    except Exception as e:
-        logger.error(f"Model building pipeline failed: {e}")
-        raise e
+        except Exception as e:
+            logger.error(f"Model building pipeline failed: {e}")
+            mlflow.log_param("status", "failed")
+            mlflow.log_param("error_message", str(e))
+            raise e
 
 
 

@@ -1,0 +1,22 @@
+artifact_path: file:C:/Users/Rohit/Documents/MLops_Practical/MLops_project_Pipelining/Dagshub_Experiment-Tracking/MLops_Cookiecutter_template_Pipelining_done/mlruns/1/models/m-8c46d7670ed24de599d6d672d0803584/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.13.7
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.6.1
+mlflow_version: 3.8.1
+model_id: m-8c46d7670ed24de599d6d672d0803584
+model_size_bytes: 138779
+model_uuid: m-8c46d7670ed24de599d6d672d0803584
+prompts: null
+run_id: 4801c0db88db463597668bd2cdf9a6f7
+utc_time_created: '2026-01-09 08:34:47.169986'
