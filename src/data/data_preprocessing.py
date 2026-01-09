@@ -9,7 +9,6 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import logging
 import yaml
-import mlflow
 
 # ---------------- Logging Configuration ---------------- #
 logger = logging.getLogger("data_preprocessing")
@@ -170,60 +169,29 @@ def main() -> None:
     train_path = os.path.join(RAW_DIR, "train.csv")
     test_path = os.path.join(RAW_DIR, "test.csv")
 
-    # Set experiment name
-    mlflow.set_experiment("Data_Preprocessing_Pipeline")
-    
-    # Start MLflow run
-    with mlflow.start_run() as run:
-        try:
-            logger.info("🚀 Starting Data Preprocessing Pipeline")
-            logger.info(f"MLflow Run ID: {run.info.run_id}")
+    try:
+        logger.info("🚀 Starting Data Preprocessing Pipeline")
 
-            text_column = load_params(PARAMS_PATH)
-            mlflow.log_param("text_column", text_column)
-            logger.info("Logged preprocessing parameters to MLflow")
-            
-            download_nltk_resources()
+        text_column = load_params(PARAMS_PATH)
+        download_nltk_resources()
 
-            train_df = load_data(train_path)
-            test_df = load_data(test_path)
-            
-            # Log input data stats
-            mlflow.log_param("train_raw_size", len(train_df))
-            mlflow.log_param("test_raw_size", len(test_df))
-            logger.info("Logged raw data statistics to MLflow")
+        train_df = load_data(train_path)
+        test_df = load_data(test_path)
 
-            train_df = normalize_text_column(train_df, text_column)
-            test_df = normalize_text_column(test_df, text_column)
+        train_df = normalize_text_column(train_df, text_column)
+        test_df = normalize_text_column(test_df, text_column)
 
-            train_df = remove_small_sentences(train_df, text_column)
-            test_df = remove_small_sentences(test_df, text_column)
-            
-            # Log preprocessing stats
-            mlflow.log_param("train_processed_size", len(train_df.dropna()))
-            mlflow.log_param("test_processed_size", len(test_df.dropna()))
-            mlflow.log_param("train_removed_rows", train_df[text_column].isna().sum())
-            mlflow.log_param("test_removed_rows", test_df[text_column].isna().sum())
-            logger.info("Logged preprocessing statistics to MLflow")
+        train_df = remove_small_sentences(train_df, text_column)
+        test_df = remove_small_sentences(test_df, text_column)
 
-            train_processed_path = os.path.join(PROCESSED_DIR, "train_processed.csv")
-            test_processed_path = os.path.join(PROCESSED_DIR, "test_processed.csv")
-            
-            save_data(train_df, train_processed_path)
-            save_data(test_df, test_processed_path)
-            
-            # Log artifacts
-            mlflow.log_artifact(train_processed_path, "processed_datasets")
-            mlflow.log_artifact(test_processed_path, "processed_datasets")
-            logger.info("Logged processed datasets to MLflow")
+        save_data(train_df, os.path.join(PROCESSED_DIR, "train_processed.csv"))
+        save_data(test_df, os.path.join(PROCESSED_DIR, "test_processed.csv"))
 
-            logger.info("Data preprocessing completed and tracked successfully.")
+        logger.info("Data preprocessing completed successfully.")
 
-        except Exception as e:
-            logger.error(f"Data preprocessing failed: {e}")
-            mlflow.log_param("status", "failed")
-            mlflow.log_param("error_message", str(e))
-            raise e
+    except Exception as e:
+        logger.error(f"Data preprocessing failed: {e}")
+        raise e
 
 
 if __name__ == "__main__":

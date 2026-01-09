@@ -10,7 +10,7 @@ import logging
 import mlflow
 import mlflow.sklearn
 
-# Set experiment name
+
 mlflow.set_experiment("Model_Evaluation")
 
 # ---------------- Logging Configuration ---------------- #
@@ -134,41 +134,22 @@ def main() -> None:
     MODEL_PATH = os.path.join("models", "model.pkl")
     METRICS_PATH = os.path.join("reports", "metrics.json")
 
-    # Start MLflow run
-    with mlflow.start_run() as run:
-        try:
-            logger.info("🚀 Starting Model Evaluation Pipeline")
-            logger.info(f"MLflow Run ID: {run.info.run_id}")
+    try:
+        logger.info("🚀 Starting Model Evaluation Pipeline")
 
-            test_df = load_features(TEST_FEATURES_PATH)
-            model = load_model(MODEL_PATH)
+        test_df = load_features(TEST_FEATURES_PATH)
+        model = load_model(MODEL_PATH)
 
-            X_test, y_test = split_features_and_labels(test_df)
-            metrics = evaluate_model(model, X_test, y_test)
+        X_test, y_test = split_features_and_labels(test_df)
+        metrics = evaluate_model(model, X_test, y_test)
 
-            save_metrics(metrics, METRICS_PATH)
+        save_metrics(metrics, METRICS_PATH)
 
-            # Log evaluation metrics to MLflow
-            mlflow.log_metrics(metrics)
-            logger.info(f"Logged evaluation metrics to MLflow: {metrics}")
-            
-            # Log test dataset info
-            mlflow.log_param("test_samples", len(X_test))
-            mlflow.log_param("test_features", X_test.shape[1])
-            logger.info("Logged test dataset information to MLflow")
-            
-            # Log artifacts
-            mlflow.log_artifact(METRICS_PATH, "evaluation")
-            mlflow.log_artifact(MODEL_PATH, "model")
-            logger.info("Logged evaluation artifacts to MLflow")
+        logger.info("Model evaluation completed successfully.")
 
-            logger.info("Model evaluation completed and tracked successfully.")
-
-        except Exception as e:
-            logger.error(f"Model evaluation pipeline failed: {e}")
-            mlflow.log_param("status", "failed")
-            mlflow.log_param("error_message", str(e))
-            raise e
+    except Exception as e:
+        logger.error(f"Model evaluation pipeline failed: {e}")
+        raise e
 
 
 if __name__ == "__main__":

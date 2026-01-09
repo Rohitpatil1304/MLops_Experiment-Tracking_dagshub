@@ -6,7 +6,6 @@ import yaml
 from sklearn.feature_extraction.text import CountVectorizer
 from scipy.sparse import csr_matrix
 import logging
-import mlflow
 
 # ---------------- Logging Configuration ---------------- #
 logger = logging.getLogger("feature_engineering")
@@ -144,60 +143,28 @@ def main() -> None:
     TEXT_COL = "content"
     LABEL_COL = "sentiment"
 
-    # Set experiment name
-    mlflow.set_experiment("Feature_Engineering_Pipeline")
-    
-    # Start MLflow run
-    with mlflow.start_run() as run:
-        try:
-            logger.info("🚀 Starting Feature Engineering Pipeline")
-            logger.info(f"MLflow Run ID: {run.info.run_id}")
+    try:
+        logger.info("🚀 Starting Feature Engineering Pipeline")
 
-            max_features = load_params(PARAMS_PATH)
-            mlflow.log_param("max_features", max_features)
-            mlflow.log_param("vectorizer", "CountVectorizer")
-            mlflow.log_param("text_column", TEXT_COL)
-            mlflow.log_param("label_column", LABEL_COL)
-            logger.info("Logged feature engineering parameters to MLflow")
+        max_features = load_params(PARAMS_PATH)
 
-            train_df = load_data(TRAIN_PATH)
-            test_df = load_data(TEST_PATH)
-            
-            # Log input data stats
-            mlflow.log_param("train_input_size", len(train_df))
-            mlflow.log_param("test_input_size", len(test_df))
-            logger.info("Logged input data statistics to MLflow")
+        train_df = load_data(TRAIN_PATH)
+        test_df = load_data(TEST_PATH)
 
-            X_train, y_train = prepare_features_and_labels(train_df, TEXT_COL, LABEL_COL)
-            X_test, y_test = prepare_features_and_labels(test_df, TEXT_COL, LABEL_COL)
+        X_train, y_train = prepare_features_and_labels(train_df, TEXT_COL, LABEL_COL)
+        X_test, y_test = prepare_features_and_labels(test_df, TEXT_COL, LABEL_COL)
 
-            vectorizer = CountVectorizer(max_features=max_features)
-            X_train_bow, X_test_bow = vectorize_text(vectorizer, X_train, X_test)
-            
-            # Log vectorization stats
-            mlflow.log_param("actual_features_generated", X_train_bow.shape[1])
-            mlflow.log_param("train_features_shape", X_train_bow.shape[0])
-            mlflow.log_param("test_features_shape", X_test_bow.shape[0])
-            logger.info("Logged vectorization statistics to MLflow")
+        vectorizer = CountVectorizer(max_features=max_features)
+        X_train_bow, X_test_bow = vectorize_text(vectorizer, X_train, X_test)
 
-            train_bow_path = os.path.join(FEATURES_DIR, "train_bow.csv")
-            test_bow_path = os.path.join(FEATURES_DIR, "test_bow.csv")
-            
-            save_features(X_train_bow, y_train, train_bow_path)
-            save_features(X_test_bow, y_test, test_bow_path)
-            
-            # Log artifacts
-            mlflow.log_artifact(train_bow_path, "engineered_features")
-            mlflow.log_artifact(test_bow_path, "engineered_features")
-            logger.info("Logged engineered features to MLflow")
+        save_features(X_train_bow, y_train, os.path.join(FEATURES_DIR, "train_bow.csv"))
+        save_features(X_test_bow, y_test, os.path.join(FEATURES_DIR, "test_bow.csv"))
 
-            logger.info("Feature engineering completed and tracked successfully.")
+        logger.info("Feature engineering completed successfully.")
 
-        except Exception as e:
-            logger.error(f"Feature engineering failed: {e}")
-            mlflow.log_param("status", "failed")
-            mlflow.log_param("error_message", str(e))
-            raise e
+    except Exception as e:
+        logger.error(f"Feature engineering failed: {e}")
+        raise e
 
 
 if __name__ == "__main__":

@@ -5,8 +5,8 @@ stages:
     deps:
     - path: src/data/Data_ingestion.py
       hash: md5
-      md5: f56cd8fd5875b23b5b041697fcb547b3
-      size: 6174
+      md5: 13030ef53c1b108a1480d544221d639e
+      size: 4433
     params:
       params.yaml:
         data_ingestion.test_size: 0.4
@@ -32,8 +32,8 @@ stages:
       size: 498489
     - path: src/data/data_preprocessing.py
       hash: md5
-      md5: 92547ac0b7aa68eaef486cf342d85e98
-      size: 7956
+      md5: 36d5d77ebc1fe9604468c6b0221b48d0
+      size: 6328
     params:
       params.yaml:
         data_preprocessing.text_column: content
@@ -59,8 +59,8 @@ stages:
       size: 339824
     - path: src/features/feature_engineering.py
       hash: md5
-      md5: e663804aa18ea8e477a416b7d70a9ff0
-      size: 6795
+      md5: bc388059ffb1abb164967bdb6a0f19f6
+      size: 5125
     params:
       params.yaml:
         feature_engineering.max_features: 100
@@ -82,8 +82,8 @@ stages:
       size: 1263769
     - path: src/models/model_building.py
       hash: md5
-      md5: 381a82eb3a7c29c062d15f43d064956b
-      size: 6061
+      md5: 3ca4a488b7fd13e2dfe2f78ad90f5247
+      size: 4716
     params:
       params.yaml:
         model_building.learning_rate: 0.1
@@ -106,8 +106,8 @@ stages:
       size: 138779
     - path: src/models/model_evaluation.py
       hash: md5
-      md5: 16f8a61ceff18f0f3aa208f4420e8177
-      size: 5436
+      md5: 4c14b5bb0798e1737ba5d9397ceafcc4
+      size: 4496
     outs:
     - path: reports/metrics.json
       hash: md5

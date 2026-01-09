@@ -5,7 +5,6 @@ import pandas as pd
 import yaml
 from sklearn.model_selection import train_test_split
 import logging
-import mlflow
 
 
 logger = logging.getLogger("data_ingestion")
@@ -132,56 +131,20 @@ def main() -> None:
     PARAMS_PATH = "params.yaml"
     OUTPUT_DIR = os.path.join("data", "raw")
 
-    # Set experiment name
-    mlflow.set_experiment("Data_Ingestion_Pipeline")
-    
-    # Start MLflow run
-    with mlflow.start_run() as run:
-        try:
-            logger.info("🚀 Starting Data Ingestion Pipeline")
-            logger.info(f"MLflow Run ID: {run.info.run_id}")
+    try:
+        logger.info("🚀 Starting Data Ingestion Pipeline")
 
-            test_size = load_params(PARAMS_PATH)
-            df = load_data(DATA_URL)
-            
-            # Log initial dataset info
-            mlflow.log_param("data_url", DATA_URL)
-            mlflow.log_param("initial_dataset_size", len(df))
-            mlflow.log_param("initial_features", df.shape[1])
-            mlflow.log_param("test_size", test_size)
-            logger.info("Logged data ingestion parameters to MLflow")
-            
-            processed_df = preprocess_data(df)
-            
-            # Log preprocessing stats
-            mlflow.log_param("processed_dataset_size", len(processed_df))
-            mlflow.log_param("removed_rows", len(df) - len(processed_df))
-            logger.info("Logged preprocessing statistics to MLflow")
-            
-            train_df, test_df = split_data(processed_df, test_size)
-            
-            # Log split stats
-            mlflow.log_param("train_set_size", len(train_df))
-            mlflow.log_param("test_set_size", len(test_df))
-            mlflow.log_param("train_test_split_ratio", f"{(1-test_size):.2f}-{test_size:.2f}")
-            logger.info("Logged train-test split statistics to MLflow")
-            
-            save_data(train_df, test_df, OUTPUT_DIR)
-            
-            # Log artifacts
-            train_path = os.path.join(OUTPUT_DIR, "train.csv")
-            test_path = os.path.join(OUTPUT_DIR, "test.csv")
-            mlflow.log_artifact(train_path, "datasets")
-            mlflow.log_artifact(test_path, "datasets")
-            logger.info("Logged dataset artifacts to MLflow")
+        test_size = load_params(PARAMS_PATH)
+        df = load_data(DATA_URL)
+        processed_df = preprocess_data(df)
+        train_df, test_df = split_data(processed_df, test_size)
+        save_data(train_df, test_df, OUTPUT_DIR)
 
-            logger.info("Data ingestion completed and tracked successfully.")
+        logger.info("Data ingestion completed successfully.")
 
-        except Exception as e:
-            logger.error(f"Data ingestion pipeline failed: {e}")
-            mlflow.log_param("status", "failed")
-            mlflow.log_param("error_message", str(e))
-            raise e
+    except Exception as e:
+        logger.error(f"Data ingestion pipeline failed: {e}")
+        raise e
 
 
 if __name__ == "__main__":
